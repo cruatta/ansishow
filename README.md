@@ -8,6 +8,7 @@ them pleasantly on a modern display.
 [Video of the original exhibit](https://www.youtube.com/watch?v=r_cYOi3pnhA)
 
 ## Demo
+Running on a Raspberry Pi Zero W in a framebuffer
 ![](./ansishow.mp4)
 
 ## Notes
