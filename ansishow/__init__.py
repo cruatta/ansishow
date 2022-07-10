@@ -1,24 +1,6 @@
 import pygame
 import sys
-from typing import List
-from pathlib import Path
-
-
-def get_image_paths(base_path: str, recursive: bool = False) -> List[str]:
-    """
-    Gets all pngs in a given base_path, optionally recursive
-    :returns:
-        List of image paths
-    """
-    def path_str(each: Path) -> str:
-        return str(each)
-
-    path = Path(base_path)
-    if recursive:
-        img_paths = path.glob('**/*.png')
-    else:
-        img_paths = path.glob('*.png')
-    return list(map(path_str, list(img_paths)))
+from ansi import ANSI
 
 
 def calc_image_xy(_screen: pygame.display, _graphic_width: int) -> (int, int):
@@ -46,13 +28,11 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = 1
 
-image_paths = get_image_paths(sys.argv[1])
-if len(image_paths) < 1:
-    sys.exit(1)
+GRAPHIC_OFFSET = 50
 
-img_idx = 0
+ansis = ANSI(sys.argv[1])
 
-graphic, graphic_width, graphic_height = load_image(image_paths[img_idx])
+graphic, graphic_width, graphic_height = load_image(ansis.next_image())
 x, y = calc_image_xy(screen, graphic_width)
 
 background = pygame.surface.Surface((screen.get_width(), screen.get_height()))
@@ -67,19 +47,19 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
                 y -= 100
-                screen.blit(graphic, (x, y))
-                pygame.display.flip()
+            if event.key == pygame.K_UP:
+                y += 100
+            if event.key == pygame.K_SPACE:
+                next_image = ansis.next_image()
+                graphic, graphic_width, graphic_height = load_image(next_image)
+                next_x, next_y = calc_image_xy(screen, graphic_width)
+                x, y = next_x, next_y + GRAPHIC_OFFSET
     screen.blit(background, (0, 0))
     screen.blit(graphic, (x, y))
     pygame.display.flip()
     y -= 1
 
-    if y < -graphic_height - 50:
-        img_idx += 1
-
-        if img_idx == len(image_paths):
-            img_idx = 0
-            image_paths = get_image_paths(sys.argv[1])
-
-        graphic, graphic_width, graphic_height = load_image(image_paths[img_idx])
+    if y < -graphic_height - GRAPHIC_OFFSET:
+        next_image = ansis.next_image()
+        graphic, graphic_width, graphic_height = load_image(next_image)
         x, y = calc_image_xy(screen, graphic_width)
