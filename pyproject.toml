@@ -1,13 +1,12 @@
 [tool.poetry]
 name = "ansishow"
-version = "0.1.0"
-description = ""
-authors = ["Cameron Ruatta <cameron@ruatta.com>"]
+version = "1.0.0"
+description = "Scroll some ANSi art on a display"
+authors = ["Cameron Ruatta <dev@ruatta.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 pygame = "^2.1.2"
-Pillow = "^9.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
