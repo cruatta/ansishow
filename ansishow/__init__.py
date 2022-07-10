@@ -1,18 +1,29 @@
 import pygame
 import sys
 from ansi import ANSI
+from dataclasses import dataclass
 
 
-def calc_image_xy(_screen: pygame.display, _graphic_width: int) -> (int, int):
+@dataclass
+class ScreenSize:
+    width: int
+    height: int
+
+    @staticmethod
+    def from_size(xy: (int, int)):
+        return ScreenSize(xy[0], xy[1])
+
+
+def calc_image_xy(screen_size: ScreenSize, _graphic_width: int) -> (int, int):
     """
     Calculate the placement of an image in the center x of the screen
     :returns:
         (x: int, y: int)
     """
-    return _screen.get_size()[0] / 2 - _graphic_width / 2, _screen.get_size()[1]
+    return screen_size.width / 2 - _graphic_width / 2, screen_size.height
 
 
-def load_image(_screen: pygame.display, path: str) -> (pygame.Surface, int, int):
+def load_image(screen_size: ScreenSize, path: str) -> (pygame.Surface, int, int):
     """
     Loads an image and returns it as a surface, and it's width and height
     :returns:
@@ -20,7 +31,7 @@ def load_image(_screen: pygame.display, path: str) -> (pygame.Surface, int, int)
     """
     img = pygame.image.load(path)
     img_width, img_height = img.get_size()
-    screen_width = screen.get_width()
+    screen_width = screen_size.width
     if img_width > screen_width:
         proportion = screen_width / img_width
         new_height = img_height * proportion
@@ -36,7 +47,7 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = 1
 
-print(f'Screen (width, height): {screen.get_size()}')
+print(f"Screen (width, height): {screen.get_size()}")
 
 NEXT_GRAPHIC_OFFSET = screen.get_size()[1] / 30
 PAGINATE_OFFSET = screen.get_size()[1] / 10
@@ -47,8 +58,10 @@ else:
 
 ansis = ANSI(sys.argv[1])
 
-graphic, graphic_width, graphic_height = load_image(screen, ansis.next_image())
-x, y = calc_image_xy(screen, graphic_width)
+graphic, graphic_width, graphic_height = load_image(
+    ScreenSize.from_size(screen.get_size()), ansis.next_image()
+)
+x, y = calc_image_xy(ScreenSize.from_size(screen.get_size()), graphic_width)
 
 background = pygame.surface.Surface((screen.get_width(), screen.get_height()))
 background.fill((0, 0, 0))
@@ -69,7 +82,9 @@ while running:
             if event.key == pygame.K_SPACE:
                 next_image = ansis.next_image()
                 graphic, graphic_width, graphic_height = load_image(next_image)
-                next_x, next_y = calc_image_xy(screen, graphic_width)
+                next_x, next_y = calc_image_xy(
+                    ScreenSize.from_size(screen.get_size()), graphic_width
+                )
                 x, y = next_x, next_y + NEXT_GRAPHIC_OFFSET
     screen.blit(background, (0, 0))
     screen.blit(graphic, (x, y))
@@ -78,5 +93,7 @@ while running:
 
     if y < -graphic_height - NEXT_GRAPHIC_OFFSET:
         next_image = ansis.next_image()
-        graphic, graphic_width, graphic_height = load_image(screen, next_image)
-        x, y = calc_image_xy(screen, graphic_width)
+        graphic, graphic_width, graphic_height = load_image(
+            ScreenSize.from_size(screen.get_size()), next_image
+        )
+        x, y = calc_image_xy(ScreenSize.from_size(screen.get_size()), graphic_width)

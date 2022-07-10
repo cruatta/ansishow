@@ -23,9 +23,9 @@ class ANSI:
 
         path = Path(base_path)
         if recursive:
-            img_paths = path.glob('**/*.png')
+            img_paths = path.glob("**/*.png")
         else:
-            img_paths = path.glob('*.png')
+            img_paths = path.glob("*.png")
         return list(map(path_str, list(img_paths)))
 
     def next_image(self) -> str:
