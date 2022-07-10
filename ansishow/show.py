@@ -15,7 +15,7 @@ class ScreenSize:
         return ScreenSize(xy[0], xy[1])
 
 
-class ShowConfig:
+class ScreenConfig:
     def __init__(self, screen_size: ScreenSize):
         self.next_graphic_offset = screen_size.height / 30
         self.paginate_offset = screen_size.height / 10
@@ -60,14 +60,21 @@ def load_image(screen_size: ScreenSize, path: str) -> (pygame.Surface, int, int)
 
 def run():
     pygame.init()
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    if len(sys.argv) < 2:
+        print("Missing arguments")
+        sys.exit(1)
+
+    if len(sys.argv) == 3 and sys.argv[2] == "--window":
+        screen = pygame.display.set_mode((640, 480))
+    else:
+        screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     clock = pygame.time.Clock()
     running = 1
 
     print(f"Screen (width, height): {screen.get_size()}")
 
     screen_size = ScreenSize.from_size(screen.get_size())
-    config = ShowConfig(screen_size)
+    screen_config = ScreenConfig(screen_size)
 
     ansis = Images(sys.argv[1])
 
@@ -86,9 +93,9 @@ def run():
                 if event.key == pygame.K_ESCAPE:
                     running = 0
                 if event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS:
-                    config.inc_scroll_offset()
+                    screen_config.inc_scroll_offset()
                 if event.key == pygame.K_MINUS or event.key == pygame.K_UNDERSCORE:
-                    config.dec_scroll_offset()
+                    screen_config.dec_scroll_offset()
                 if event.key == pygame.K_r:
                     ansis.reload()
                     print("Reloaded")
@@ -96,9 +103,9 @@ def run():
                     ansis.randomize()
                     print("Randomized")
                 if event.key == pygame.K_DOWN:
-                    y -= config.paginate_offset
+                    y -= screen_config.paginate_offset
                 if event.key == pygame.K_UP:
-                    y += config.paginate_offset
+                    y += screen_config.paginate_offset
                 if event.key == pygame.K_PAGEUP or event.key == pygame.K_PAGEDOWN:
                     if event.key == pygame.K_PAGEDOWN:
                         next_image = ansis.next_image()
@@ -108,13 +115,13 @@ def run():
                         screen_size, next_image
                     )
                     next_x, next_y = calc_image_xy(screen_size, graphic_width)
-                    x, y = next_x, next_y + config.next_graphic_offset
+                    x, y = next_x, next_y + screen_config.next_graphic_offset
         screen.blit(background, (0, 0))
         screen.blit(graphic, (x, y))
         pygame.display.flip()
-        y -= config.scroll_offset
+        y -= screen_config.scroll_offset
 
-        if y < -graphic_height - config.next_graphic_offset:
+        if y < -graphic_height - screen_config.next_graphic_offset:
             screen.fill((0, 0, 0))
             next_image = ansis.next_image()
             graphic, graphic_width, graphic_height = load_image(
