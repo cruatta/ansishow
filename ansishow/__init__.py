@@ -78,11 +78,9 @@ while running:
             if event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS:
                 if SCROLL_OFFSET < 10:
                     SCROLL_OFFSET += 1
-                    print(SCROLL_OFFSET)
             if event.key == pygame.K_MINUS or event.key == pygame.K_UNDERSCORE:
                 if SCROLL_OFFSET > 0:
                     SCROLL_OFFSET -= 1
-                    print(SCROLL_OFFSET)
             if event.key == pygame.K_r:
                 ansis.reload()
                 ansis.randomize()
