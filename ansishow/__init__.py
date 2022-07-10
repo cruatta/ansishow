@@ -28,7 +28,8 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = 1
 
-GRAPHIC_OFFSET = 50
+NEXT_GRAPHIC_OFFSET = screen.get_size()[1] / 30
+SCROLL_OFFSET = screen.get_size()[1] / 10
 
 ansis = ANSI(sys.argv[1])
 
@@ -46,20 +47,20 @@ while running:
             running = 0
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
-                y -= 100
+                y -= SCROLL_OFFSET
             if event.key == pygame.K_UP:
-                y += 100
+                y += SCROLL_OFFSET
             if event.key == pygame.K_SPACE:
                 next_image = ansis.next_image()
                 graphic, graphic_width, graphic_height = load_image(next_image)
                 next_x, next_y = calc_image_xy(screen, graphic_width)
-                x, y = next_x, next_y + GRAPHIC_OFFSET
+                x, y = next_x, next_y + NEXT_GRAPHIC_OFFSET
     screen.blit(background, (0, 0))
     screen.blit(graphic, (x, y))
     pygame.display.flip()
     y -= 1
 
-    if y < -graphic_height - GRAPHIC_OFFSET:
+    if y < -graphic_height - NEXT_GRAPHIC_OFFSET:
         next_image = ansis.next_image()
         graphic, graphic_width, graphic_height = load_image(next_image)
         x, y = calc_image_xy(screen, graphic_width)
