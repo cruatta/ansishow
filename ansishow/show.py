@@ -1,8 +1,8 @@
 import math
 import pygame
-import sys
 from images import Images
 from dataclasses import dataclass
+from argparse import ArgumentParser
 
 
 @dataclass
@@ -16,7 +16,9 @@ class ScreenSize:
 
 
 class ScreenConfig:
-    def __init__(self, screen_size: ScreenSize):
+    def __init__(self, screen_size: ScreenSize, scaled: bool):
+        self.screen_size = screen_size
+        self.scaled = scaled
         self.next_graphic_offset = screen_size.height / 30
         self.paginate_offset = screen_size.height / 10
         self.scroll_offset = 1
@@ -39,7 +41,7 @@ def calc_image_xy(screen_size: ScreenSize, _graphic_width: int) -> (int, int):
     return screen_size.width / 2 - _graphic_width / 2, screen_size.height
 
 
-def load_image(screen_size: ScreenSize, path: str) -> (pygame.Surface, int, int):
+def load_image(screen_config: ScreenConfig, path: str) -> (pygame.Surface, int, int):
     """
     Loads an image and returns it as a surface, and it's width and height
     :returns:
@@ -47,8 +49,8 @@ def load_image(screen_size: ScreenSize, path: str) -> (pygame.Surface, int, int)
     """
     img = pygame.image.load(path)
     img_width, img_height = img.get_size()
-    screen_width = screen_size.width
-    if img_width > screen_width:
+    screen_width = screen_config.screen_size.width
+    if img_width > screen_width or screen_config.scaled:
         proportion: float = screen_width / img_width
         new_height: int = math.floor(img_height * proportion)
 
@@ -60,11 +62,13 @@ def load_image(screen_size: ScreenSize, path: str) -> (pygame.Surface, int, int)
 
 def run():
     pygame.init()
-    if len(sys.argv) < 2:
-        print("Missing arguments")
-        sys.exit(1)
+    args = ArgumentParser()
+    args.add_argument('path', type=str)
+    args.add_argument('--window', type=bool, const=True, default=False, nargs='?')
+    args.add_argument('--scaled', type=bool, const=True, default=False, nargs='?')
+    config = args.parse_args()
 
-    if len(sys.argv) == 3 and sys.argv[2] == "--window":
+    if config.window:
         screen = pygame.display.set_mode((640, 480))
     else:
         screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -74,11 +78,11 @@ def run():
     print(f"Screen (width, height): {screen.get_size()}")
 
     screen_size = ScreenSize.from_size(screen.get_size())
-    screen_config = ScreenConfig(screen_size)
+    screen_config = ScreenConfig(screen_size, True)
 
-    ansis = Images(sys.argv[1])
+    ansis = Images(config.path)
 
-    graphic, graphic_width, graphic_height = load_image(screen_size, ansis.next_image())
+    graphic, graphic_width, graphic_height = load_image(screen_config, ansis.next_image())
     x, y = calc_image_xy(screen_size, graphic_width)
 
     background = pygame.surface.Surface((screen.get_width(), screen.get_height()))
@@ -112,7 +116,7 @@ def run():
                     else:
                         next_image = ansis.prev_image()
                     graphic, graphic_width, graphic_height = load_image(
-                        screen_size, next_image
+                        screen_config, next_image
                     )
                     next_x, next_y = calc_image_xy(screen_size, graphic_width)
                     x, y = next_x, next_y + screen_config.next_graphic_offset
@@ -125,6 +129,6 @@ def run():
             screen.fill((0, 0, 0))
             next_image = ansis.next_image()
             graphic, graphic_width, graphic_height = load_image(
-                ScreenSize.from_size(screen.get_size()), next_image
+                screen_config, next_image
             )
             x, y = calc_image_xy(screen_size, graphic_width)
