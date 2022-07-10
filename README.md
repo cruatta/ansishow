@@ -9,6 +9,8 @@ them pleasantly on a modern display.
 
 ## Demo
 Running on a Raspberry Pi Zero W in a framebuffer
+
+
 ![](./ansishow.mp4)
 
 ## Notes
