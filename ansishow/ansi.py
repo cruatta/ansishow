@@ -1,5 +1,6 @@
 from typing import List
 from pathlib import Path
+from random import shuffle
 
 
 class ANSI:
@@ -28,9 +29,15 @@ class ANSI:
             img_paths = path.glob("*.png")
         return list(map(path_str, list(img_paths)))
 
+    def reload(self):
+        self.image_index = 0
+        self.image_paths = ANSI.get_image_paths(self.path)
+
     def next_image(self) -> str:
         self.image_index += 1
         if self.image_index == len(self.image_paths):
-            self.image_index = 0
-            self.image_paths = ANSI.get_image_paths(self.path)
+            self.reload()
         return self.image_paths[self.image_index]
+
+    def randomize(self):
+        shuffle(self.image_paths)

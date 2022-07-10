@@ -75,13 +75,18 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = 0
+            if event.key == pygame.K_r:
+                ansis.reload()
+                ansis.randomize()
             if event.key == pygame.K_DOWN:
                 y -= PAGINATE_OFFSET
             if event.key == pygame.K_UP:
                 y += PAGINATE_OFFSET
             if event.key == pygame.K_SPACE:
                 next_image = ansis.next_image()
-                graphic, graphic_width, graphic_height = load_image(next_image)
+                graphic, graphic_width, graphic_height = load_image(
+                    ScreenSize.from_size(screen.get_size()), next_image
+                )
                 next_x, next_y = calc_image_xy(
                     ScreenSize.from_size(screen.get_size()), graphic_width
                 )
