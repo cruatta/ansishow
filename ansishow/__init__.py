@@ -12,7 +12,7 @@ def calc_image_xy(_screen: pygame.display, _graphic_width: int) -> (int, int):
     return _screen.get_size()[0] / 2 - _graphic_width / 2, _screen.get_size()[1]
 
 
-def load_image(path: str) -> (pygame.Surface, int, int):
+def load_image(_screen: pygame.display, path: str) -> (pygame.Surface, int, int):
     """
     Loads an image and returns it as a surface, and it's width and height
     :returns:
@@ -20,6 +20,14 @@ def load_image(path: str) -> (pygame.Surface, int, int):
     """
     img = pygame.image.load(path)
     img_width, img_height = img.get_size()
+    screen_width = screen.get_width()
+    if img_width > screen_width:
+        proportion = screen_width / img_width
+        new_height = img_height * proportion
+
+        img = pygame.transform.scale(img, (screen_width, new_height))
+        img_width = screen_width
+        img_height = new_height
     return img, img_width, img_height
 
 
@@ -31,11 +39,15 @@ running = 1
 print(f'Screen (width, height): {screen.get_size()}')
 
 NEXT_GRAPHIC_OFFSET = screen.get_size()[1] / 30
-SCROLL_OFFSET = screen.get_size()[1] / 10
+PAGINATE_OFFSET = screen.get_size()[1] / 10
+if len(sys.argv) > 2:
+    SCROLL_OFFSET = int(sys.argv[2])
+else:
+    SCROLL_OFFSET = 1
 
 ansis = ANSI(sys.argv[1])
 
-graphic, graphic_width, graphic_height = load_image(ansis.next_image())
+graphic, graphic_width, graphic_height = load_image(screen, ansis.next_image())
 x, y = calc_image_xy(screen, graphic_width)
 
 background = pygame.surface.Surface((screen.get_width(), screen.get_height()))
@@ -51,9 +63,9 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 running = 0
             if event.key == pygame.K_DOWN:
-                y -= SCROLL_OFFSET
+                y -= PAGINATE_OFFSET
             if event.key == pygame.K_UP:
-                y += SCROLL_OFFSET
+                y += PAGINATE_OFFSET
             if event.key == pygame.K_SPACE:
                 next_image = ansis.next_image()
                 graphic, graphic_width, graphic_height = load_image(next_image)
@@ -62,9 +74,9 @@ while running:
     screen.blit(background, (0, 0))
     screen.blit(graphic, (x, y))
     pygame.display.flip()
-    y -= 1
+    y -= SCROLL_OFFSET
 
     if y < -graphic_height - NEXT_GRAPHIC_OFFSET:
         next_image = ansis.next_image()
-        graphic, graphic_width, graphic_height = load_image(next_image)
+        graphic, graphic_width, graphic_height = load_image(screen, next_image)
         x, y = calc_image_xy(screen, graphic_width)
