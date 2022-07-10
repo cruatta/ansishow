@@ -1,3 +1,3 @@
-from game import run
+from show import run
 
 run()
