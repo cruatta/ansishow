@@ -4,17 +4,20 @@ from typing import List
 from pathlib import Path
 
 
-def get_image_paths(base_path: str) -> List[str]:
+def get_image_paths(base_path: str, recursive: bool = False) -> List[str]:
     """
-
-    :param base_path:
-    :return:
+    Gets all pngs in a given base_path, optionally recursive
+    :returns:
+        List of image paths
     """
     def path_str(each: Path) -> str:
         return str(each)
 
     path = Path(base_path)
-    img_paths = path.glob('**/*.png')
+    if recursive:
+        img_paths = path.glob('**/*.png')
+    else:
+        img_paths = path.glob('*.png')
     return list(map(path_str, list(img_paths)))
 
 
@@ -76,6 +79,7 @@ while running:
 
         if img_idx == len(image_paths):
             img_idx = 0
-        else:
-            graphic, graphic_width, graphic_height = load_image(image_paths[img_idx])
-            x, y = calc_image_xy(screen, graphic_width)
+            image_paths = get_image_paths(sys.argv[1])
+
+        graphic, graphic_width, graphic_height = load_image(image_paths[img_idx])
+        x, y = calc_image_xy(screen, graphic_width)
