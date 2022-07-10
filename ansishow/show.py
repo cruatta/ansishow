@@ -63,9 +63,9 @@ def load_image(screen_config: ScreenConfig, path: str) -> (pygame.Surface, int, 
 def run():
     pygame.init()
     args = ArgumentParser()
-    args.add_argument('path', type=str)
-    args.add_argument('--window', type=bool, const=True, default=False, nargs='?')
-    args.add_argument('--scaled', type=bool, const=True, default=False, nargs='?')
+    args.add_argument("path", type=str)
+    args.add_argument("--window", type=bool, const=True, default=False, nargs="?")
+    args.add_argument("--scaled", type=bool, const=True, default=False, nargs="?")
     config = args.parse_args()
 
     if config.window:
@@ -82,7 +82,9 @@ def run():
 
     ansis = Images(config.path)
 
-    graphic, graphic_width, graphic_height = load_image(screen_config, ansis.next_image())
+    graphic, graphic_width, graphic_height = load_image(
+        screen_config, ansis.next_image()
+    )
     x, y = calc_image_xy(screen_size, graphic_width)
 
     background = pygame.surface.Surface((screen.get_width(), screen.get_height()))
