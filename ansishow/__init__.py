@@ -1,7 +1,9 @@
+import math
 import pygame
 import sys
-from ansi import ANSI
+from images import Images
 from dataclasses import dataclass
+from argparse import ArgumentParser
 
 
 @dataclass
@@ -33,8 +35,8 @@ def load_image(screen_size: ScreenSize, path: str) -> (pygame.Surface, int, int)
     img_width, img_height = img.get_size()
     screen_width = screen_size.width
     if img_width > screen_width:
-        proportion = screen_width / img_width
-        new_height = img_height * proportion
+        proportion: float = screen_width / img_width
+        new_height: int = math.floor(img_height * proportion)
 
         img = pygame.transform.scale(img, (screen_width, new_height))
         img_width = screen_width
@@ -51,12 +53,9 @@ print(f"Screen (width, height): {screen.get_size()}")
 
 NEXT_GRAPHIC_OFFSET = screen.get_size()[1] / 30
 PAGINATE_OFFSET = screen.get_size()[1] / 10
-if len(sys.argv) > 2:
-    SCROLL_OFFSET = int(sys.argv[2])
-else:
-    SCROLL_OFFSET = 1
+SCROLL_OFFSET = 1
 
-ansis = ANSI(sys.argv[1])
+ansis = Images(sys.argv[1])
 
 graphic, graphic_width, graphic_height = load_image(
     ScreenSize.from_size(screen.get_size()), ansis.next_image()
@@ -83,13 +82,19 @@ while running:
                     SCROLL_OFFSET -= 1
             if event.key == pygame.K_r:
                 ansis.reload()
+                print("Reloaded")
+            if event.key == pygame.K_TAB:
                 ansis.randomize()
+                print("Randomized")
             if event.key == pygame.K_DOWN:
                 y -= PAGINATE_OFFSET
             if event.key == pygame.K_UP:
                 y += PAGINATE_OFFSET
-            if event.key == pygame.K_SPACE:
-                next_image = ansis.next_image()
+            if event.key == pygame.K_PAGEUP or event.key == pygame.K_PAGEDOWN:
+                if event.key == pygame.K_PAGEDOWN:
+                    next_image = ansis.next_image()
+                else:
+                    next_image = ansis.prev_image()
                 graphic, graphic_width, graphic_height = load_image(
                     ScreenSize.from_size(screen.get_size()), next_image
                 )

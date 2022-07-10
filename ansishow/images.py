@@ -3,10 +3,10 @@ from pathlib import Path
 from random import shuffle
 
 
-class ANSI:
+class Images:
     def __init__(self, path: str):
         self.path = path
-        self.image_paths = ANSI.get_image_paths(path)
+        self.image_paths = Images.get_image_paths(path)
         if len(self.image_paths) < 1:
             raise ValueError("Invalid Path - No Images")
         self.image_index = 0
@@ -30,13 +30,18 @@ class ANSI:
         return list(map(path_str, list(img_paths)))
 
     def reload(self):
-        self.image_index = 0
-        self.image_paths = ANSI.get_image_paths(self.path)
+        self.image_paths = Images.get_image_paths(self.path)
 
     def next_image(self) -> str:
         self.image_index += 1
         if self.image_index == len(self.image_paths):
-            self.reload()
+            self.image_index = 0
+        return self.image_paths[self.image_index]
+
+    def prev_image(self) -> str:
+        self.image_index -= 1
+        if self.image_index < 0:
+            self.image_index = 0
         return self.image_paths[self.image_index]
 
     def randomize(self):
