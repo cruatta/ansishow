@@ -75,6 +75,14 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = 0
+            if event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS:
+                if SCROLL_OFFSET < 10:
+                    SCROLL_OFFSET += 1
+                    print(SCROLL_OFFSET)
+            if event.key == pygame.K_MINUS or event.key == pygame.K_UNDERSCORE:
+                if SCROLL_OFFSET > 0:
+                    SCROLL_OFFSET -= 1
+                    print(SCROLL_OFFSET)
             if event.key == pygame.K_r:
                 ansis.reload()
                 ansis.randomize()
@@ -97,6 +105,7 @@ while running:
     y -= SCROLL_OFFSET
 
     if y < -graphic_height - NEXT_GRAPHIC_OFFSET:
+        screen.fill((0, 0, 0))
         next_image = ansis.next_image()
         graphic, graphic_width, graphic_height = load_image(
             ScreenSize.from_size(screen.get_size()), next_image
