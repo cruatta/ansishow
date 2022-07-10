@@ -61,9 +61,9 @@ background.fill((0, 0, 0))
 
 while running:
     clock.tick(60)
-    for event in pygame.event.get():  # get user input
-        if event.type == pygame.QUIT:  # if user clicks the close X
-            running = 0  # make running 0 to break out of loop
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = 0
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
                 y -= 100
@@ -71,7 +71,7 @@ while running:
                 pygame.display.flip()
     screen.blit(background, (0, 0))
     screen.blit(graphic, (x, y))
-    pygame.display.flip()  # Update screen
+    pygame.display.flip()
     y -= 1
 
     if y < -graphic_height - 50:
