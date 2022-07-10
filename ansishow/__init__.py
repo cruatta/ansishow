@@ -28,6 +28,8 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = 1
 
+print(f'Screen (width, height): {screen.get_size()}')
+
 NEXT_GRAPHIC_OFFSET = screen.get_size()[1] / 30
 SCROLL_OFFSET = screen.get_size()[1] / 10
 
@@ -46,6 +48,8 @@ while running:
         if event.type == pygame.QUIT:
             running = 0
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = 0
             if event.key == pygame.K_DOWN:
                 y -= SCROLL_OFFSET
             if event.key == pygame.K_UP:
