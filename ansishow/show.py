@@ -78,7 +78,7 @@ def run():
     print(f"Screen (width, height): {screen.get_size()}")
 
     screen_size = ScreenSize.from_size(screen.get_size())
-    screen_config = ScreenConfig(screen_size, True)
+    screen_config = ScreenConfig(screen_size, config.scaled)
 
     ansis = Images(config.path)
 
