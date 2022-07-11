@@ -69,11 +69,11 @@ test = ["appdirs (==1.4.4)", "pytest-cov (>=2.7)", "pytest-mock (>=3.6)", "pytes
 
 [[package]]
 name = "pygame"
-version = "2.1.2"
+version = "1.9.6"
 description = "Python Game Development"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = "*"
 
 [[package]]
 name = "tomli"
@@ -94,7 +94,7 @@ python-versions = ">=3.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "058bdd43766a91a10642739cddbfc76a270dbc9c42399f73bce5f35bb242b7f1"
+content-hash = "23b0ebfd97cb99ddd15cf652418e5e4168ddce23f39e904d2a0e081cf07df99e"
 
 [metadata.files]
 black = []

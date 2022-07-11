@@ -35,6 +35,7 @@ class Images:
     def next_image(self) -> str:
         self.image_index += 1
         if self.image_index == len(self.image_paths):
+            self.reload()
             self.image_index = 0
         return self.image_paths[self.image_index]
 
