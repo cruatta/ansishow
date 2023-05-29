@@ -62,14 +62,12 @@ def load_image(screen_config: ScreenConfig, path: str) -> (pygame.Surface, int, 
 
 def run():
     pygame.init()
-    pygame.joystick.init()
-    joystick = pygame.joystick.Joystick(0)
-    joystick.init()
 
-    button_map = {}
-    for i in range(joystick.get_numbuttons()):
-        button_name = joystick.get_name(i)
-        button_map[i] = button_name
+    joystick_count = pygame.joystick.get_count()
+    if joystick_count == 1:
+        pygame.joystick.init()
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
 
     args = ArgumentParser()
     args.add_argument("path", type=str)
@@ -109,7 +107,7 @@ def run():
             if event.type == pygame.KEYDOWN or event.type == pygame.JOYBUTTONDOWN:
                 if(event.type == pygame.JOYBUTTONDOWN):
                     button_num = event.button
-                    button_name = button_map.get(button_num, f"Button {button_num}")
+                    button_name = f"Button {button_num}"
                     alert_surface = alert_font.render(f'Pressed {button_name}', True, (255, 255, 255))
                     alert_rect = alert_surface.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
                     screen.blit(alert_surface, alert_rect)
