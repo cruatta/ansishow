@@ -11,7 +11,7 @@ them pleasantly on a modern display.
 ## Demo
 Running on a Raspberry Pi Zero W in a framebuffer
 
-![](./ansishow.mp4)
+https://github.com/user-attachments/assets/77afbc01-3563-42f7-815d-9d98361c3cee
 
 ## Notes
 This project doesn't use real ANSI/ASCII files since it's very difficult to make these render properly at the correct scale
