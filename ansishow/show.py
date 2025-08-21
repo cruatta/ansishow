@@ -1,6 +1,8 @@
 import math
+from typing import Tuple
+
 import pygame
-from images import Images
+from ansishow.images import Images
 from dataclasses import dataclass
 from argparse import ArgumentParser
 
@@ -11,7 +13,7 @@ class ScreenSize:
     height: int
 
     @staticmethod
-    def from_size(xy: (int, int)):
+    def from_size(xy: Tuple[int, int]):
         return ScreenSize(xy[0], xy[1])
 
 
@@ -32,16 +34,16 @@ class ScreenConfig:
             self.scroll_offset -= 1
 
 
-def calc_image_xy(screen_size: ScreenSize, _graphic_width: int) -> (int, int):
+def calc_image_xy(screen_size: ScreenSize, _graphic_width: int) -> Tuple[float, int]:
     """
     Calculate the placement of an image in the center x of the screen
     :returns:
-        (x: int, y: int)
+        (x: float, y: int)
     """
     return screen_size.width / 2 - _graphic_width / 2, screen_size.height
 
 
-def load_image(screen_config: ScreenConfig, path: str) -> (pygame.Surface, int, int):
+def load_image(screen_config: ScreenConfig, path: str) -> Tuple[pygame.Surface, int, int]:
     """
     Loads an image and returns it as a surface, and it's width and height
     :returns:
@@ -66,6 +68,7 @@ def run():
     args.add_argument("path", type=str)
     args.add_argument("--window", type=bool, const=True, default=False, nargs="?")
     args.add_argument("--scaled", type=bool, const=True, default=False, nargs="?")
+    args.add_argument('--rotate', type=int, choices=[0, 90, 180, 270], default=0, nargs="?")
     config = args.parse_args()
 
     if config.window:
@@ -77,7 +80,17 @@ def run():
 
     print(f"Screen (width, height): {screen.get_size()}")
 
-    screen_size = ScreenSize.from_size(screen.get_size())
+    # Handle rotation - create render surface with appropriate dimensions
+    screen_width, screen_height = screen.get_size()
+    if config.rotate in [90, 270]:
+        # Swap dimensions for 90/270 degree rotations
+        render_size = (screen_height, screen_width)
+    else:
+        render_size = (screen_width, screen_height)
+    
+    render_surface = pygame.surface.Surface(render_size)
+    
+    screen_size = ScreenSize.from_size(render_size)
     screen_config = ScreenConfig(screen_size, config.scaled)
 
     ansis = Images(config.path)
@@ -87,7 +100,7 @@ def run():
     )
     x, y = calc_image_xy(screen_size, graphic_width)
 
-    background = pygame.surface.Surface((screen.get_width(), screen.get_height()))
+    background = pygame.surface.Surface(render_size)
     background.fill((0, 0, 0))
 
     while running:
@@ -99,9 +112,9 @@ def run():
                 if event.key == pygame.K_ESCAPE:
                     running = 0
                 if event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS:
-                    screen_config.inc_scroll_offset()
-                if event.key == pygame.K_MINUS or event.key == pygame.K_UNDERSCORE:
                     screen_config.dec_scroll_offset()
+                if event.key == pygame.K_MINUS or event.key == pygame.K_UNDERSCORE:
+                    screen_config.inc_scroll_offset()
                 if event.key == pygame.K_r:
                     ansis.reload()
                     print("Reloaded")
@@ -122,13 +135,26 @@ def run():
                     )
                     next_x, next_y = calc_image_xy(screen_size, graphic_width)
                     x, y = next_x, next_y + screen_config.next_graphic_offset
-        screen.blit(background, (0, 0))
-        screen.blit(graphic, (x, y))
+
+        # Render to the render surface
+        render_surface.blit(background, (0, 0))
+        render_surface.blit(graphic, (x, y))
+        
+        # Apply rotation and blit to actual screen
+        if config.rotate != 0:
+            rotated_surface = pygame.transform.rotate(render_surface, config.rotate)
+            # Center the rotated surface on the screen
+            rot_rect = rotated_surface.get_rect(center=(screen_width//2, screen_height//2))
+            screen.fill((0, 0, 0))  # Clear screen first
+            screen.blit(rotated_surface, rot_rect)
+        else:
+            screen.blit(render_surface, (0, 0))
+            
         pygame.display.flip()
         y -= screen_config.scroll_offset
 
         if y < -graphic_height - screen_config.next_graphic_offset:
-            screen.fill((0, 0, 0))
+            render_surface.fill((0, 0, 0))
             next_image = ansis.next_image()
             graphic, graphic_width, graphic_height = load_image(
                 screen_config, next_image

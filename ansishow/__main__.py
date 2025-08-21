@@ -1,3 +1,3 @@
-from show import run
+from ansishow.show import run
 
 run()
