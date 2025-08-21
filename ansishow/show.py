@@ -64,6 +64,13 @@ def load_image(screen_config: ScreenConfig, path: str) -> Tuple[pygame.Surface, 
 
 def run():
     pygame.init()
+
+    joystick_count = pygame.joystick.get_count()
+    if joystick_count == 1:
+        pygame.joystick.init()
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
+
     args = ArgumentParser()
     args.add_argument("path", type=str)
     args.add_argument("--window", type=bool, const=True, default=False, nargs="?")
@@ -103,12 +110,21 @@ def run():
     background = pygame.surface.Surface(render_size)
     background.fill((0, 0, 0))
 
+    alert_font = pygame.font.SysFont("Arial", 30)
+
     while running:
         clock.tick(60)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = 0
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN or event.type == pygame.JOYBUTTONDOWN:
+                if(event.type == pygame.JOYBUTTONDOWN):
+                    button_num = event.button
+                    button_name = f"Button {button_num}"
+                    alert_surface = alert_font.render(f'Pressed {button_name}', True, (255, 255, 255))
+                    alert_rect = alert_surface.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+                    screen.blit(alert_surface, alert_rect)
+                    pygame.display.flip()
                 if event.key == pygame.K_ESCAPE:
                     running = 0
                 if event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS:
